@@ -1,0 +1,383 @@
+getgenv().SecureMode = true
+
+local api = loadstring(game:HttpGet("https://raw.githubusercontent.com/kometa-anon/kometa/main/api/api.lua"))()
+
+local lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+
+local Window = lib:CreateWindow({
+
+   Name = "Mix Hub | v1.0.0.0",
+
+   LoadingTitle = "Mix Hub | Thank You For Using Our Script!",
+
+   LoadingSubtitle = "By Sun Hub Developers.",
+
+   ConfigurationSaving = {
+
+      Enabled = false,
+
+      FolderName = nil,
+
+      FileName = "Mix Hub"
+
+   },
+
+   Discord = {
+
+      Enabled = true,
+
+      Invite = "PN3eBppX7W",
+
+      RememberJoins = true
+
+   },
+
+   KeySystem = true,
+
+   KeySettings = {
+
+      Title = "Mix Hub | v1.0.0.0",
+
+      Subtitle = "Mix Hub Key System",
+
+      Note = "Join the discord (https://discord.gg/bpN2xn8ZwB)",
+
+      FileName = "Mix Hub Key",
+
+      SaveKey = false,
+
+      GrabKeyFromSite = false,
+
+      Key = "1"
+
+   }
+
+})
+
+local Tab = Window:CreateTab("Main", 4483362458)
+
+local CombatTab = Window:CreateTab("Combat", 4483362458)
+
+local MiscTab = Window:CreateTab("Misc", 4483362458)
+
+MiscTab:CreateSection("Character")
+
+CombatTab:CreateSection("Combat")
+
+Tab:CreateSection("AutoFarm")
+
+_G.FARM = {
+
+   state = false,
+
+   speed = 10
+
+}
+
+_G.FARM.tweeninfo = TweenInfo.new(_G.FARM.speed, Enum.EasingStyle.Linear)
+
+_G.Location = "Sunflower Field"
+
+_G.TELEPORT = {
+
+   ["Sunflower Field"] = Vector3.new(-212.238, 4.49415, 182.679),
+
+   ["Dandelion Field"] = Vector3.new(0, 0, 0),
+
+   ["Mushroom Field"] = Vector3.new(0, 0, 0),
+
+   ["Clover Field"] = Vector3.new(0, 0, 0),
+
+   ["Blue Flower Field"] = Vector3.new(0, 0, 0),
+
+   ["Spider Field"] = Vector3.new(0, 0, 0),
+
+   ["Strawberry Field"] = Vector3.new(0, 0, 0),
+
+   ["Bamboo Field"] = Vector3.new(0, 0, 0)
+
+}
+
+local Players = game:GetService"Players"
+
+local TweenService = game:GetService"TweenService"
+
+local Player = Players.LocalPlayer
+
+local Character = Player.Character
+
+local Humanoid = Character.Humanoid
+
+local BoostFPS = MiscTab:CreateButton({
+
+   Name = "Boost FPS",
+
+   Callback = function()
+
+	settings().Rendering.QualityLevel = 1	for i,v in pairs(game:GetDescendants()) do
+
+		if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+
+			v.Material = "Plastic"
+
+			v.Reflectance = 0
+
+		elseif v:IsA("Decal") then
+
+			v.Transparency = 1
+
+		elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+
+			v.Lifetime = NumberRange.new(0)
+
+		elseif v:IsA("Explosion") then
+
+			v.BlastPressure = 1
+
+			v.BlastRadius = 1
+
+		end
+
+	end
+
+	workspace.DescendantAdded:Connect(function(child)
+
+		coroutine.wrap(function()
+
+			if child:IsA('ForceField') then
+
+				RunService.Heartbeat:Wait()
+
+				child:Destroy()
+
+			elseif child:IsA('Sparkles') then
+
+				RunService.Heartbeat:Wait()
+
+				child:Destroy()
+
+			elseif child:IsA('Smoke') or child:IsA('Fire') then
+
+				RunService.Heartbeat:Wait()
+
+				child:Destroy()
+
+			end
+
+		end)()
+
+	end)
+
+   end,
+
+})
+
+local DisableRender = MiscTab:CreateToggle({
+
+   Name = "Disable 3D Render",
+
+   CurrentValue = false,
+
+   Flag = "RenderDisabled",
+
+   Callback = function(state)
+
+      game:GetService("RunService"):Set3dRenderingEnabled(not state)
+
+      end,
+
+})
+
+local WalkSpeed = MiscTab:CreateSlider({
+
+   Name = "WalkSpeed",
+
+   Range = {16, 70},
+
+   Increment = 1,
+
+   Suffix = "Walk Speed",
+
+   CurrentValue = 16,
+
+   Flag = "WalkSpeed",
+
+   Callback = function(number)
+
+      Humanoid.WalkSpeed = number
+
+   end,
+
+})
+
+local JumpPower = MiscTab:CreateSlider({
+
+   Name = "JumpHeight",
+
+   Range = {5, 30},
+
+   Increment = 1,
+
+   Suffix = "Jump Height",
+
+   CurrentValue = 5,
+
+   Flag = "JumpPower",
+
+   Callback = function(number)
+
+      Humanoid.JumpHeight = number
+
+   end,
+
+})
+
+local Dropdown = Tab:CreateDropdown({
+
+   Name = "Choose A Field To AutoFarm In",
+
+   Options = {
+
+      "Sunflower Field",
+
+      "Dandelion Field",
+
+      "Mushroom Field",
+
+      "Clover Field",
+
+      "Blue Flower Field",
+
+      "Spider Field",
+
+      "Strawberry Field",
+
+      "Bamboo Field"
+
+   },
+
+   CurrentOption = "Sunflower Field",
+
+   Flag = "FarmTeleport",
+
+   Callback = function(key)
+
+      _G.Location = key
+
+   end,
+
+})
+
+local Farm = Tab:CreateToggle({
+
+   Name = "Auto Farm",
+
+   CurrentValue = _G.FARM.state,
+
+   Flag = "AutoFarm",
+
+   Callback = function(state)
+
+      _G.FARM.state = state
+
+      while _G.FARM.state and task.wait() do
+
+         local tween = TweenService:Create(Character.HumanoidRootPart, _G.FARM.tweeninfo, {CFrame = CFrame.new(_G.TELEPORT[_G.Location])})
+
+         tween:Play()
+
+         tween.Completed:Wait()
+
+      end
+
+   end,
+
+})
+
+local AutoDig = Tab:CreateToggle({
+
+   Name = "Auto Dig",
+
+   CurrentValue = false,
+
+   Flag = "AutoDig",
+
+   Callback = function(state)
+
+       if CurrentValue == true then
+
+                   if game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") and game.Players.LocalPlayer.Character:FindFirstChildOfClass('Tool'):FindFirstChild('ClientScriptMouse') then
+
+            pcall(function()getsenv(game.Players.LocalPlayer.Character:FindFirstChildOfClass('Tool').ClientScriptMouse).collectStart()
+
+             end)
+
+          end
+
+       end
+
+ end,
+
+})
+
+local AutoSprinkler = Tab:CreateToggle({
+
+   Name = "Auto Place Sprinkler",
+
+   CurrentValue = _G.FARM.state,
+
+   Flag = "AutoSprinkler",
+
+   Callback = function(state)
+
+      _G.FARM.state = state
+
+      while _G.FARM.state and task.wait() do
+
+         local tween = TweenService:Create(Character.HumanoidRootPart, _G.FARM.tweeninfo, {CFrame = CFrame.new(_G.TELEPORT[_G.Location])})
+
+         tween:Play()
+
+         tween.Completed:Wait()
+
+      end
+
+   end,
+
+})
+
+local AvoidMobs = CombatTab:CreateToggle({
+
+   Name = "Avoid Mobs",
+
+   CurrentValue = false,
+
+   Flag = "AvoidMobs",
+
+   Callback = function(state)
+
+       if CurrentValue == true then
+
+       function avoidmob()
+
+    for i,v in next, game:GetService("Workspace").Monsters:GetChildren() do
+
+        if v:FindFirstChild("Head") then
+
+            if (v.Head.Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).magnitude < 35 and Character.humanoid:GetState() ~= Enum.HumanoidStateType.Freefall then
+
+                game.Players.LocalPlayer.Character.Humanoid.Jump = true
+
+            end
+
+         end
+
+      end
+
+    end
+
+   end
+
+ end,
+
+})
