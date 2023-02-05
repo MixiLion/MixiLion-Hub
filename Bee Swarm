@@ -10,7 +10,7 @@ local Window = lib:CreateWindow({
 
    LoadingTitle = "Mix Hub | Thank You For Using Our Script!",
 
-   LoadingSubtitle = "By Sun Hub Developers.",
+   LoadingSubtitle = "By MixiLion.",
 
    ConfigurationSaving = {
 
